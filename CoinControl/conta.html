@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Coin Control - Login</title>
+    <link rel="stylesheet" href="./style.css">
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,100..900;1,100..900&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+</head>
+
+<body>
+
+    <header>
+        <h1>Coin Control</h1>
+        <div class="top">
+            <a href="index.html">Home</a>
+            <a href="suporte.html">Suporte</a>
+            <a href="conta.html">Login</a>
+            <a href="Planejamento.html">Planejamento</a>
+        </div>
+    </header>
+
+    <main class="login">
+        <form id="loginForm">
+            <div class="inputWrapper">
+                <label for="Email">Email</label>
+                <input type="text" id="Email" placeholder="Digite seu login" class="person" required>
+            </div>
+
+            <div class="inputWrapper">
+                <label for="password">Senha</label>
+                <input type="password" id="password" placeholder="Digite sua senha" class="arroba" required>
+            </div>
+
+            <div>
+                <input type="submit" value="Entrar" class="button">
+            </div>
+
+            <a href="">Não tem Login? Clique para fazer o cadastro</a>
+        </form>
+
+        <figure>
+            <img src="./assets/undraw_welcome_cats.svg" alt="">
+        </figure>
+    </main>
+
+    <script>
+        // Manipula o login
+        document.getElementById('loginForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+
+            // Obtendo os valores dos campos de login e senha
+            const email = document.getElementById('Email').value; // Corrigido para usar o ID correto
+            const password = document.getElementById('password').value;
+
+            try {
+                // Enviando a requisição para a API
+                const response = await axios.post('http://localhost:3333/auth', { email, password });
+
+                // Armazenando o token recebido
+                localStorage.setItem('token', response.data.token);
+
+                // Redirecionando para a página de Planejamento
+                window.location.href = 'Planejamento.html';
+            } catch (error) {
+                console.error('Erro no login:', error.response?.data || error.message);
+                alert('Erro ao realizar login. Verifique suas credenciais.');
+            }
+        });
+    </script>
+
+</body>
+
+</html>
