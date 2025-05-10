@@ -1,11 +1,9 @@
-<script setup lang="ts">
-import LoginPage from './components/Login.vue';
-</script>
-
 <template>
-  <LoginPage></LoginPage>
+  <router-view />
 </template>
 
-<style scoped>
+<script setup lang="ts">
+// não importa o LoginPage diretamente aqui
+</script>
 
-</style>
+<style scoped></style>
