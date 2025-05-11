@@ -71,7 +71,7 @@ export default {
         // Redirecionar para a página principal
         this.$router.push('/dashboard');
       } catch (error) {
-        this.error = error.message || 'Credenciais inválidas';
+        this.error = error as string || 'Credenciais inválidas';
       } finally {
         this.isLoading = false;
       }

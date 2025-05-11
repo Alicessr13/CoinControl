@@ -1,5 +1,4 @@
 import { FastifyReply, FastifyRequest } from "fastify";
-import { id_planejamento_schema } from "..";
 import { z } from "zod";
 import { QueryConfig } from "pg";
 import { sql } from "@/lib/pg";
@@ -7,7 +6,8 @@ import { AppError } from "@/errors/app-error";
 
 export async function putPlanejamento(request: FastifyRequest, reply: FastifyReply) {
     const { id_usuario } = request.user;
-    const { id_planejamento } = id_planejamento_schema.parse(request.params);
+    const { id_planejamento } = request.params as { id_planejamento: string }; // Corrigido para acessar corretamente o parâmetro
+    const id_planejamento_numero = parseInt(id_planejamento, 10); // Converter para número
 
     let query: QueryConfig = {
         text: `
@@ -16,7 +16,7 @@ export async function putPlanejamento(request: FastifyRequest, reply: FastifyRep
             AND id_usuario = $2
         `,
         values: [
-            id_planejamento,
+            id_planejamento_numero,
             id_usuario,
         ],
     };
@@ -24,7 +24,7 @@ export async function putPlanejamento(request: FastifyRequest, reply: FastifyRep
     const planejamento = await sql(query);
 
     if (!planejamento.length) {
-        throw new AppError('Planejamento não encontrado', 404);
+        throw new AppError('Planejamento não encontrado', 404);
     }
     
     const planejamento_body_schema = z.object({
@@ -44,7 +44,7 @@ export async function putPlanejamento(request: FastifyRequest, reply: FastifyRep
         values: [
             descricao,
             valor,
-            id_planejamento,
+            id_planejamento_numero,
         ],
     };
 

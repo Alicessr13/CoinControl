@@ -14,8 +14,19 @@
                 <div v-if="rendas.length === 0" class="no-data">Nenhuma renda cadastrada.</div>
                 <ul class="renda-list" v-else>
                     <li v-for="renda in rendas" :key="renda.id_renda">
-                        <span>{{ renda.descricao }} - R$ {{ renda.valor }}</span>
-                        <button @click="excluirRenda(renda.id_renda)">Excluir</button>
+                        <template v-if="editandoRendaId === renda.id_renda">
+                            <input v-model="descricaoEditada" />
+                            <input v-model.number="valorEditado" type="number" />
+                            <button @click="salvarEdicaoRenda">Salvar</button>
+                            <button @click="cancelarEdicaoRenda">Cancelar</button>
+                        </template>
+                        <template v-else>
+                            <span>{{ renda.descricao }} - R$ {{ renda.valor }}</span>
+                            <div style="display: flex; gap: 0.5rem">
+                                <button @click="iniciarEdicaoRenda(renda)">Editar</button>
+                                <button @click="excluirRenda(renda.id_renda)">Excluir</button>
+                            </div>
+                        </template>
                     </li>
                 </ul>
             </div>
@@ -31,8 +42,19 @@
                 <div v-if="gastos.length === 0" class="no-data">Nenhum gasto cadastrado.</div>
                 <ul class="renda-list" v-else>
                     <li v-for="gasto in gastos" :key="gasto.id_gasto">
-                        <span>{{ gasto.descricao }} - R$ {{ gasto.valor }}</span>
-                        <button @click="excluirGasto(gasto.id_gasto)">Excluir</button>
+                        <template v-if="editandoGastoId === gasto.id_gasto">
+                            <input v-model="descricaoEditadaGasto" />
+                            <input v-model.number="valorEditadoGasto" type="number" />
+                            <button @click="salvarEdicaoGasto">Salvar</button>
+                            <button @click="cancelarEdicaoGasto">Cancelar</button>
+                        </template>
+                        <template v-else>
+                            <span>{{ gasto.descricao }} - R$ {{ gasto.valor }}</span>
+                            <div style="display: flex; gap: 0.5rem">
+                                <button @click="iniciarEdicaoGasto(gasto)">Editar</button>
+                                <button @click="excluirGasto(gasto.id_gasto)">Excluir</button>
+                            </div>
+                        </template>
                     </li>
                 </ul>
             </div>
@@ -48,33 +70,60 @@
                 <div v-if="planejamentos.length === 0" class="no-data">Nenhum planejamento cadastrado.</div>
                 <ul class="renda-list" v-else>
                     <li v-for="p in planejamentos" :key="p.id_planejamento">
-                        <span>{{ p.descricao }} - {{ p.valor }}% - Valor calculado: R$ {{ p.valor_calculado }}</span>
+                        <template v-if="editandoPlanejamentoId === p.id_planejamento">
+                            <input v-model="descricaoEditadaPlanejamento" />
+                            <input v-model.number="valorEditadoPlanejamento" type="number" />
+                            <button @click="salvarEdicaoPlanejamento">Salvar</button>
+                            <button @click="cancelarEdicaoPlanejamento">Cancelar</button>
+                        </template>
+                        <template v-else>
+                            <span>{{ p.descricao }} - {{ p.valor }}% - Valor calculado: R$ {{ p.valor_calculado
+                            }}</span>
+                            <div style="display: flex; gap: 0.5rem">
+                                <button @click="iniciarEdicaoPlanejamento(p)">Editar</button>
+                                <button @click="excluirPlanejamento(p.id_planejamento)">Excluir</button>
+                            </div>
+                        </template>
                     </li>
                 </ul>
             </div>
 
+            <section class="mt-8">
+                <ChartDoughnut :rendas="rendas" :gastos="gastos" :planejamentos="planejamentos" />
+            </section>
+
             <button class="logout-button" @click="logout">Sair</button>
+            <button>
+                <a href="/change-password">Alterar Senha</a>
+            </button>
         </div>
     </div>
 </template>
 
 <script lang="ts">
-import { defineComponent, ref, onMounted } from 'vue'
-/* import jwt_decode from 'jwt-decode'
+import { defineComponent, ref, onMounted } from 'vue';
+import { jwtDecode } from 'jwt-decode';
+import ChartDoughnut from './ChartDoughnut.vue';
 
 interface JwtPayload {
     id_usuario: number
     email: string
-} */
+}
 
 export default defineComponent({
     // eslint-disable-next-line vue/multi-word-component-names
     name: 'Dashboard',
+    components: { ChartDoughnut },
     setup() {
         const userEmail = ref('')
+        const userId = ref<number | null>(null)
         const rendas = ref<{ id_renda: number; descricao: string; valor: number }[]>([])
         const novaDescricao = ref('')
         const novoValor = ref<number | null>(null)
+        const editandoRendaId = ref<number | null>(null)
+        const descricaoEditada = ref('')
+        const valorEditado = ref<number | null>(null)
+
 
         const carregarRendas = async () => {
             const token = localStorage.getItem('token')
@@ -136,9 +185,51 @@ export default defineComponent({
             }
         }
 
+        const iniciarEdicaoRenda = (renda: { id_renda: number; descricao: string; valor: number }) => {
+            editandoRendaId.value = renda.id_renda
+            descricaoEditada.value = renda.descricao
+            valorEditado.value = renda.valor
+        }
+
+        const salvarEdicaoRenda = async () => {
+            const token = localStorage.getItem('token')
+            if (!token || editandoRendaId.value === null || !descricaoEditada.value || !valorEditado.value) return
+
+            try {
+                await fetch(`http://localhost:3333/renda/${editandoRendaId.value}`, {
+                    method: 'PUT',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        Authorization: `Bearer ${token}`,
+                    },
+                    body: JSON.stringify({
+                        descricao: descricaoEditada.value,
+                        valor: valorEditado.value,
+                    }),
+                })
+
+                editandoRendaId.value = null
+                descricaoEditada.value = ''
+                valorEditado.value = null
+                await carregarRendas()
+            } catch (err) {
+                console.error('Erro ao editar renda', err)
+            }
+        }
+
+        const cancelarEdicaoRenda = () => {
+            editandoRendaId.value = null
+            descricaoEditada.value = ''
+            valorEditado.value = null
+        }
+
+
         const gastos = ref<{ id_gasto: number; descricao: string; valor: number }[]>([])
         const novaDescricaoGasto = ref('')
         const novoValorGasto = ref<number | null>(null)
+        const editandoGastoId = ref<number | null>(null)
+        const descricaoEditadaGasto = ref('')
+        const valorEditadoGasto = ref<number | null>(null)
 
         const carregarGastos = async () => {
             const token = localStorage.getItem('token')
@@ -201,9 +292,50 @@ export default defineComponent({
             }
         }
 
+        const iniciarEdicaoGasto = (gasto: { id_gasto: number; descricao: string; valor: number }) => {
+            editandoGastoId.value = gasto.id_gasto
+            descricaoEditadaGasto.value = gasto.descricao
+            valorEditadoGasto.value = gasto.valor
+        }
+
+        const salvarEdicaoGasto = async () => {
+            const token = localStorage.getItem('token')
+            if (!token || editandoGastoId.value === null || !descricaoEditadaGasto.value || !valorEditadoGasto.value) return
+
+            try {
+                await fetch(`http://localhost:3333/gasto/${editandoGastoId.value}`, {
+                    method: 'PUT',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        Authorization: `Bearer ${token}`,
+                    },
+                    body: JSON.stringify({
+                        descricao: descricaoEditadaGasto.value,
+                        valor: valorEditadoGasto.value,
+                    }),
+                })
+
+                editandoGastoId.value = null
+                descricaoEditadaGasto.value = ''
+                valorEditadoGasto.value = null
+                await carregarGastos()
+            } catch (err) {
+                console.error('Erro ao editar gasto', err)
+            }
+        }
+
+        const cancelarEdicaoGasto = () => {
+            editandoGastoId.value = null
+            descricaoEditadaGasto.value = ''
+            valorEditadoGasto.value = null
+        }
+
         const planejamentos = ref<{ id_planejamento: number; descricao: string; valor: number; valor_calculado: number }[]>([])
         const novaDescricaoPlanejamento = ref('')
         const novoPercentualPlanejamento = ref<number | null>(null)
+        const editandoPlanejamentoId = ref<number | null>(null)
+        const descricaoEditadaPlanejamento = ref('')
+        const valorEditadoPlanejamento = ref<number | null>(null)
 
         const carregarPlanejamentos = async () => {
             const token = localStorage.getItem('token')
@@ -247,17 +379,75 @@ export default defineComponent({
             }
         }
 
+        const iniciarEdicaoPlanejamento = (p: { id_planejamento: number; descricao: string; valor: number }) => {
+            editandoPlanejamentoId.value = p.id_planejamento
+            descricaoEditadaPlanejamento.value = p.descricao
+            valorEditadoPlanejamento.value = p.valor
+        }
+
+        const salvarEdicaoPlanejamento = async () => {
+            const token = localStorage.getItem('token')
+            if (!token || editandoPlanejamentoId.value === null || !descricaoEditadaPlanejamento.value || !valorEditadoPlanejamento.value) return
+
+            try {
+                await fetch(`http://localhost:3333/planejamento/${editandoPlanejamentoId.value}`, {
+                    method: 'PUT',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        Authorization: `Bearer ${token}`,
+                    },
+                    body: JSON.stringify({
+                        descricao: descricaoEditadaPlanejamento.value,
+                        valor: valorEditadoPlanejamento.value,
+                    }),
+                })
+
+                editandoPlanejamentoId.value = null
+                descricaoEditadaPlanejamento.value = ''
+                valorEditadoPlanejamento.value = null
+                await carregarPlanejamentos()
+            } catch (err) {
+                console.error('Erro ao editar planejamento', err)
+            }
+        }
+
+        const cancelarEdicaoPlanejamento = () => {
+            editandoPlanejamentoId.value = null
+            descricaoEditadaPlanejamento.value = ''
+            valorEditadoPlanejamento.value = null
+        }
+
+        const excluirPlanejamento = async (id: number) => {
+            const token = localStorage.getItem('token')
+            if (!token) return
+
+            try {
+                await fetch(`http://localhost:3333/planejamento/${id}`, {
+                    method: 'DELETE',
+                    headers: {
+                        Authorization: `Bearer ${token}`,
+                    },
+                })
+                await carregarPlanejamentos()
+            } catch (err) {
+                console.error('Erro ao excluir planejamento', err)
+            }
+        }
+
         const logout = () => {
             localStorage.removeItem('token')
             window.location.href = '/login'
         }
 
         onMounted(() => {
-            /*             const token = localStorage.getItem('token')
-                        if (token) {
-                            const decoded = jwt_decode<JwtPayload>(token)
-                            userEmail.value = decoded.email
-                        } */
+            const token = localStorage.getItem('token')
+            if (token) {
+                const decoded = jwtDecode<JwtPayload>(token);
+                userEmail.value = decoded.email;
+                userId.value = decoded.id_usuario;
+            }
+            console.log(userEmail.value);
+            console.log(userId.value);
 
             carregarRendas()
             carregarGastos()
@@ -281,6 +471,25 @@ export default defineComponent({
             novaDescricaoPlanejamento,
             novoPercentualPlanejamento,
             criarPlanejamento,
+            editandoRendaId,
+            descricaoEditada,
+            valorEditado,
+            iniciarEdicaoRenda,
+            salvarEdicaoRenda,
+            cancelarEdicaoRenda,
+            editandoGastoId,
+            descricaoEditadaGasto,
+            valorEditadoGasto,
+            iniciarEdicaoGasto,
+            salvarEdicaoGasto,
+            cancelarEdicaoGasto,
+            editandoPlanejamentoId,
+            descricaoEditadaPlanejamento,
+            valorEditadoPlanejamento,
+            iniciarEdicaoPlanejamento,
+            salvarEdicaoPlanejamento,
+            cancelarEdicaoPlanejamento,
+            excluirPlanejamento
         }
     },
 })

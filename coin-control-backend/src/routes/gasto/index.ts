@@ -5,7 +5,8 @@ import { z } from 'zod';
 import { routesIdGasto } from './id_gasto';
 import { validateToken } from '@/middlewares/validate-token';
 
-const id_gasto_schema = z.object({ id_gasto: z.number().int().positive() });
+// Alterado para string já que virá da URL
+const id_gasto_schema = z.object({ id_gasto: z.string() });
 
 async function routes(fastify: FastifyInstance) {
     fastify.addHook('onRequest', validateToken);

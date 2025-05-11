@@ -1,5 +1,4 @@
 import { FastifyReply, FastifyRequest } from "fastify";
-import { id_renda_schema } from "..";
 import { z } from "zod";
 import { QueryConfig } from "pg";
 import { sql } from "@/lib/pg";
@@ -7,7 +6,8 @@ import { AppError } from "@/errors/app-error";
 
 export async function putRenda(request: FastifyRequest, reply: FastifyReply) {
     const { id_usuario } = request.user;
-    const { id_renda } = id_renda_schema.parse(request.params);
+    const { id_renda } = request.params as { id_renda: string }; // Corrigido para acessar corretamente o parâmetro
+    const id_renda_numero = parseInt(id_renda, 10); // Converter para número
 
     let query: QueryConfig = {
         text: `
@@ -16,7 +16,7 @@ export async function putRenda(request: FastifyRequest, reply: FastifyReply) {
             AND id_usuario = $2
         `,
         values: [
-            id_renda,
+            id_renda_numero,
             id_usuario,
         ],
     };
@@ -24,7 +24,7 @@ export async function putRenda(request: FastifyRequest, reply: FastifyReply) {
     const renda = await sql(query);
 
     if (!renda.length) {
-        throw new AppError('Renda não encontrada', 404);
+        throw new AppError('Renda não encontrada', 404);
     }
     
     const renda_body_schema = z.object({
@@ -44,7 +44,7 @@ export async function putRenda(request: FastifyRequest, reply: FastifyReply) {
         values: [
             descricao,
             valor,
-            id_renda,
+            id_renda_numero,
         ],
     };
 
