@@ -1,26 +1,23 @@
-import { Pool, QueryConfig } from 'pg';
+import { Client, QueryConfig } from 'pg';
 import { env } from '@/env';
 
-const pool = new Pool({
-    user: env.USER,
-    host: env.HOST,
-    database: env.DATABASE,
-    password: env.PASSWORD,
-    port: env.PORT,
-});
-
 export async function sql<T>(query: QueryConfig): Promise<T[]> {
-    const client = await pool.connect();
+    const client = new Client({
+        host: env.HOST,
+        port: env.PORT,
+        user: env.USER,
+        password: env.PASSWORD,
+        database: env.DATABASE,
+    });
 
     try {
+        await client.connect();
         const result = await client.query(query);
         return result.rows;
     } catch (error) {
         console.error('Erro ao executar a consulta SQL:', error);
         throw error;
     } finally {
-        client.release();
+        await client.end();
     }
 }
-
-process.on('exit', () => pool.end());
