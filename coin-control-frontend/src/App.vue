@@ -1,11 +1,11 @@
 <template>
-  <div class="app-container">
-    <NavBar />
-    <main class="main-content">
-      <router-view />
-    </main>
-    <Footer />
-  </div>
+	<div class="app-container">
+		<NavBar />
+		<main class="main-content">
+			<router-view />
+		</main>
+		<Footer />
+	</div>
 </template>
 
 <script setup lang="ts">
@@ -16,16 +16,16 @@ import Footer from './components/Footer.vue';
 
 <style scoped>
 .app-container {
-  min-height: 100vh;
-  display: grid;
-  grid-template-rows: auto 1fr auto;
-  grid-template-areas:
-    "header"
-    "main"
-    "footer";
+	min-height: 100vh;
+	display: grid;
+	grid-template-rows: auto 1fr auto;
+	grid-template-areas:
+		"header"
+		"main"
+		"footer";
 }
 
 .main-content {
-  grid-area: main;
+	grid-area: main;
 }
 </style>
