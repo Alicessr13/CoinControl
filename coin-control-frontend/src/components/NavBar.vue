@@ -2,7 +2,7 @@
   <nav class="w-full">
     <div class="bg-black p-8 text-3xl text-white p-4 flex justify-between items-center">
       <div class="text-5xl flex items-center gap-4">
-        <DollarIcon :size="40" color="#9810fa" />
+        <CircleDollarSign :size="40" color="#9810fa" />
         <router-link to="/" class="hover:text-purple-600">
           Coin Control
         </router-link>
@@ -34,7 +34,7 @@
 </template>
 
 <script lang="ts">
-import DollarIcon from './icons/DollarIcon.vue'
+import { CircleDollarSign } from 'lucide-vue-next'
 
 export default {
   name: 'NavBar',
@@ -44,7 +44,7 @@ export default {
     }
   },
   components: {
-    DollarIcon,
+    CircleDollarSign
   },
   methods: {
     toggleMenu() {
