@@ -1,6 +1,6 @@
 <template>
   <nav class="w-full">
-    <div class="bg-black p-8 text-3xl text-white p-4 flex justify-between items-center">
+    <div class="bg-black p-8 text-3xl text-white p-4 gap-8 flex justify-between items-center relative">
       <div class="text-5xl flex items-center gap-4">
         <CircleDollarSign :size="40" color="#9810fa" />
         <router-link to="/" class="hover:text-purple-600">
@@ -8,8 +8,12 @@
         </router-link>
 
       </div>
+      <!-- Botão hambúrguer visível apenas em mobile -->
+      <button @click="toggleMenu" class="md:hidden text-white text-4xl">
+        ☰
+      </button>
 
-      <ul class="flex gap-8">
+      <ul class="hidden md:flex gap-8">
         <li class="">
           <router-link to="/" class="">Início</router-link>
         </li>
@@ -24,10 +28,37 @@
         </li>
       </ul>
 
-      <div class="flex gap-8">
-          <button>Entrar</button>
-          <button>Começar Grátis</button>
+      <div class="hidden md:flex gap-8">
+        <button>Entrar</button>
+        <button>Começar Grátis</button>
       </div>
+
+      <Transition name="slide-fade">
+        <div v-if="menuOpen"
+          class="md:hidden absolute flex flex-col gap-8 p-8 rounded-xl top-22 right-0 bg-black text-white">
+
+          <div class="flex flex-col text-start items-start gap-8">
+            <button>Entrar</button>
+            <button>Começar Grátis</button>
+          </div>
+
+          <ul class="flex flex-col gap-8">
+            <li class="">
+              <router-link to="/" class="">Início</router-link>
+            </li>
+            <li class="">
+              <router-link to="/about" class="">Planejamento</router-link>
+            </li>
+            <li class="">
+              <router-link to="/dashboard" class="">Sobre</router-link>
+            </li>
+            <li class="">
+              <router-link to="/contact" class="">Contato</router-link>
+            </li>
+          </ul>
+
+        </div>
+      </Transition>
 
     </div>
   </nav>
@@ -49,16 +80,13 @@ export default {
   methods: {
     toggleMenu() {
       this.menuOpen = !this.menuOpen
-      const menu = document.querySelector('.nav-menu')
-      menu?.classList.toggle('active')
     }
   }
 }
 </script>
 
 <style scoped>
-
-.buttonClick{
+.buttonClicked {
   background-color: #9810fa;
   color: white;
   border: none;
@@ -67,4 +95,24 @@ export default {
   cursor: pointer;
 }
 
+.slide-fade-enter-active,
+.slide-fade-leave-active {
+  transition: all 0.3s ease;
+}
+.slide-fade-enter-from {
+  opacity: 0;
+  transform: translateX(50%);
+}
+.slide-fade-enter-to {
+  opacity: 1;
+  transform: translateX(0);
+}
+.slide-fade-leave-from {
+  opacity: 1;
+  transform: translateX(0);
+}
+.slide-fade-leave-to {
+  opacity: 0;
+  transform: translateX(50%);
+}
 </style>
