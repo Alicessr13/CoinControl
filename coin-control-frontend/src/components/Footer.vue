@@ -1,5 +1,5 @@
 <template>
-	<div class="w-full flex justify-between bg-black text-white py-6 px-12 text-center">
+	<div class="w-full flex justify-between bg-black text-white pt-6 pb-8 px-12 text-center">
 		<div class="flex flex-col items-start justify-start w-full max-w-xl gap-6">
       <div class="text-4xl flex items-center gap-4">
         <CircleDollarSign :size="35" color="#9810fa" />
@@ -47,7 +47,19 @@
         <span>Segurança</span>
       </div>
     </div>
+
 	</div>
+  <div class="border-t border-gray-800 w-full"></div>
+  <div class="w-full flex items-center justify-between bg-black text-white py-4 px-12">
+    <div class="text-center text-white text-xl py-4">
+      © 2023 Coin Control. Todos os direitos reservados.
+    </div>
+    <div class="flex gap-8 text-xl">
+      <router-link to="/privacy" class="hover:text-purple-600">Privacidade</router-link>
+      <router-link to="/terms" class="hover:text-purple-600">Serviço</router-link>
+      <router-link to="/cookies" class="hover:text-purple-600">Cookies</router-link>
+    </div>
+  </div>
 </template>
 
 <script lang="ts">

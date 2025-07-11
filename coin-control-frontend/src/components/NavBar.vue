@@ -94,25 +94,4 @@ export default {
   border-radius: 5px;
   cursor: pointer;
 }
-
-.slide-fade-enter-active,
-.slide-fade-leave-active {
-  transition: all 0.3s ease;
-}
-.slide-fade-enter-from {
-  opacity: 0;
-  transform: translateX(50%);
-}
-.slide-fade-enter-to {
-  opacity: 1;
-  transform: translateX(0);
-}
-.slide-fade-leave-from {
-  opacity: 1;
-  transform: translateX(0);
-}
-.slide-fade-leave-to {
-  opacity: 0;
-  transform: translateX(50%);
-}
 </style>
