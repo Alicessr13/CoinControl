@@ -1,51 +1,91 @@
 <template>
-  <div class="login-container">
-    <div class="login-card">
-      <h1 class="login-title">Coin Control</h1>
-      <p class="login-subtitle">Entre em sua conta</p>
+  <div class="flex flex-col gap-12 p-24 h-full w-full items-center justify-center bg-black  text-white">
 
-      <div v-if="error" class="error-message">
-        {{ error }}
-      </div>
+    <div class="text-7xl font-bold">
+      Entre na sua <span class="rainbow-text">conta</span>
+    </div>
 
-      <form @submit.prevent="handleLogin" class="login-form">
-        <div class="form-group">
-          <label for="email">Email</label>
-          <input id="email" v-model="email" type="email" placeholder="Seu email" required class="form-input" />
+    <div class="text-3xl">
+      Acesse sua conta para gerenciar suas finanças
+    </div>
+
+    <div class="flex min-w-[400px] flex-col gap-12 bg-gray-900/50 p-8 border border-purple-500/40 rounded-lg shadow-lg">
+
+      <div class="text-5xl text-center font-bold">Login</div>
+
+      <form class="flex flex-col gap-12" @submit.prevent="handleLogin">
+        <div class="flex flex-col gap-4">
+          <label class="text-3xl" for="email">Email</label>
+          <input
+            class="w-full text-3xl p-2 bg-gray-800/50 border-gray-700 rounded-lg text-white placeholder:text-gray-400"
+            id="email" v-model="email" type="email" placeholder="Seu email" required />
         </div>
 
-        <div class="form-group">
-          <label for="password">Senha</label>
-          <input id="password" v-model="password" type="password" placeholder="Sua senha" required class="form-input" />
+        <div class="flex flex-col gap-4">
+          <label class="text-3xl" for="password">Senha</label>
+          <input
+            class="w-full text-3xl p-2 bg-gray-800/50 border-gray-700 rounded-lg text-white placeholder:text-gray-400"
+            id="password" v-model="password" type="password" placeholder="Sua senha" required />
         </div>
 
-        <button type="submit" class="login-button" :disabled="isLoading">
+        <div class="flex flex-col gap-4 items-start justify-between md:flex-row">
+          <div class="flex items-center gap-4">
+            <div @click="remember = !remember"
+              class="w-6 h-6 rounded-full border border-white/50 flex items-center justify-center cursor-pointer transition duration-200"
+              :class="remember ? 'bg-purple-600 border-purple-600' : 'bg-transparent'">
+              <Check v-if="remember" class="text-white transition-transform duration-200"
+                :class="remember ? 'scale-100' : 'scale-0'" :size="16" />
+            </div>
+            <!-- <input type="checkbox" id="remember" v-model="remember"
+            class="appearance-none w-6 h-6 rounded-full border border-white/50 checked:bg-purple-600 checked:border-purple-600 transition duration-200 cursor-pointer" /> -->
+            <label for="remember" class="text-2xl text-white">Lembrar-me</label>
+          </div>
+          <div class="flex items-center justify-end">
+            <a href="/forgot-password" class="text-purple-600 hover:text-white text-2xl">Esqueci minha senha</a>
+          </div>
+        </div>
+
+        <button class="w-full text-3xl p-2 bg-gradient-to-r from-purple-500 to-pink-500 text-white rounded-lg cursor-pointer hover:bg-gradient-to-r hover:from-pink-500 hover:to-purple-500 hover:text-black transition duration-200"
+          type="submit" :disabled="isLoading">
           {{ isLoading ? 'Entrando...' : 'Entrar' }}
         </button>
       </form>
 
-      <p class="register-text">
-        Não tem uma conta? <a href="/register">Registre-se</a>
-      </p>
+      <div class="text-center text-2xl">
+        Não tem uma conta? <a href="/register" class="text-purple-600 hover:text-white text-2xl">Criar conta</a>
+      </div>
+    </div>
+
+    <div v-if="error">
+      {{ error }}
     </div>
   </div>
+
 </template>
 
 <script lang="ts">
+import { Check } from 'lucide-vue-next'
+import { ref } from 'vue';
+import { useRouter } from 'vue-router';
+
 export default {
-  name: 'LoginPage',
-  data() {
-    return {
-      email: '',
-      password: '',
-      error: '',
-      isLoading: false
-    }
+  components: {
+    Check
   },
-  methods: {
-    async handleLogin() {
-      this.error = '';
-      this.isLoading = true;
+  name: 'LoginPage',
+  setup() {
+    const email = ref('');
+    const password = ref('');
+    const error = ref('');
+    const isLoading = ref(false);
+    const remember = ref(false);
+
+    const router = useRouter();
+
+
+    const handleLogin = async () => {
+      error.value = '';
+      isLoading.value = true;
 
       try {
         const response = await fetch('http://localhost:3333/auth', {
@@ -54,8 +94,9 @@ export default {
             'Content-Type': 'application/json'
           },
           body: JSON.stringify({
-            email: this.email,
-            password: this.password
+            email: email.value,
+            password: password.value,
+            remember: remember.value
           })
         });
 
@@ -69,115 +110,24 @@ export default {
         localStorage.setItem('token', data.token);
 
         // Redirecionar para a página principal
-        this.$router.push('/dashboard');
-      } catch (error) {
-        this.error = error as string || 'Credenciais inválidas';
+        router.push('/dashboard');
+      } catch (err) {
+        error.value = err as string || 'Credenciais inválidas';
       } finally {
-        this.isLoading = false;
+        isLoading.value = false;
       }
     }
+
+    return {
+      email,
+      password,
+      error,
+      isLoading,
+      remember,
+      handleLogin
+    };
   }
 }
 </script>
 
-<style scoped>
-.login-container {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  height: 100vh;
-  background-color: #f5f5f5;
-}
-
-.login-card {
-  width: 100%;
-  max-width: 400px;
-  padding: 2rem;
-  background-color: white;
-  border-radius: 8px;
-  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-}
-
-.login-title {
-  font-size: 2rem;
-  font-weight: bold;
-  text-align: center;
-  margin-bottom: 0.5rem;
-  color: #2c3e50;
-}
-
-.login-subtitle {
-  text-align: center;
-  margin-bottom: 1.5rem;
-  color: #7f8c8d;
-}
-
-.login-form {
-  display: flex;
-  flex-direction: column;
-  gap: 1rem;
-}
-
-.form-group {
-  display: flex;
-  flex-direction: column;
-  gap: 0.5rem;
-}
-
-label {
-  font-size: 0.9rem;
-  color: #2c3e50;
-}
-
-.form-input {
-  padding: 0.75rem;
-  border: 1px solid #ddd;
-  border-radius: 4px;
-  font-size: 1rem;
-}
-
-.login-button {
-  margin-top: 1rem;
-  padding: 0.75rem;
-  background-color: #3498db;
-  color: white;
-  border: none;
-  border-radius: 4px;
-  font-size: 1rem;
-  cursor: pointer;
-  transition: background-color 0.3s;
-}
-
-.login-button:hover {
-  background-color: #2980b9;
-}
-
-.login-button:disabled {
-  background-color: #95a5a6;
-  cursor: not-allowed;
-}
-
-.error-message {
-  background-color: #ffdddd;
-  color: #d63031;
-  padding: 0.75rem;
-  border-radius: 4px;
-  margin-bottom: 1rem;
-}
-
-.register-text {
-  margin-top: 1.5rem;
-  text-align: center;
-  font-size: 0.9rem;
-  color: #7f8c8d;
-}
-
-.register-text a {
-  color: #3498db;
-  text-decoration: none;
-}
-
-.register-text a:hover {
-  text-decoration: underline;
-}
-</style>
+<style scoped></style>

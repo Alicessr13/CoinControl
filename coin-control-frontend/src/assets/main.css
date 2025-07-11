@@ -1,15 +1,15 @@
 * {
-    margin: 0;
-    size: 0;
-    box-sizing: border-box;
-    font-family: 'Roboto', sans-serif;
-    /*content box = width trata do tamanho do conteúdo do elemento, não considerando seu padding e border*/
-    /*border-box = o tamanho agora levará em conta até a borda, ou seja, o width será a soma do conteúdo com a borda e o padding.*/
+  margin: 0;
+  size: 0;
+  box-sizing: border-box;
+  font-family: 'Roboto', sans-serif;
+  /*content box = width trata do tamanho do conteúdo do elemento, não considerando seu padding e border*/
+  /*border-box = o tamanho agora levará em conta até a borda, ou seja, o width será a soma do conteúdo com a borda e o padding.*/
 }
 
 :root {
-    font-size: 62.5%;
-    font-family: 'Poppins', sans-serif;
+  font-size: 62.5%;
+  font-family: 'Poppins', sans-serif;
 }
 
 @import "tailwindcss";
@@ -25,19 +25,66 @@
 .slide-fade-leave-active {
   transition: all 0.3s ease;
 }
+
 .slide-fade-enter-from {
   opacity: 0;
   transform: translateX(50%);
 }
+
 .slide-fade-enter-to {
   opacity: 1;
   transform: translateX(0);
 }
+
 .slide-fade-leave-from {
   opacity: 1;
   transform: translateX(0);
 }
+
 .slide-fade-leave-to {
   opacity: 0;
   transform: translateX(50%);
+}
+
+.rainbow-gradient {
+  background: linear-gradient(45deg, #ff0000, #ff7f00, #ffff00, #00ff00, #0000ff, #4b0082, #9400d3);
+  background-size: 200% 200%;
+  animation: rainbow 3s ease infinite;
+}
+
+.rainbow-text {
+  background: linear-gradient(45deg, #ff0000, #ff7f00, #ffff00, #00ff00, #0000ff, #4b0082, #9400d3);
+  background-size: 200% 200%;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  animation: rainbow 3s ease infinite;
+}
+
+@keyframes rainbow {
+  0% {
+    background-position: 0% 50%;
+  }
+
+  50% {
+    background-position: 100% 50%;
+  }
+
+  100% {
+    background-position: 0% 50%;
+  }
+}
+
+.glass-effect {
+  backdrop-filter: blur(10px);
+  background: rgba(255, 255, 255, 0.1);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+.purple-gradient {
+  background: linear-gradient(135deg, #8B5CF6 0%, #A855F7 100%);
+}
+
+.dark-gradient {
+  background: linear-gradient(135deg, #000000 0%, #1a1a1a 100%);
 }

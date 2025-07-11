@@ -1,6 +1,6 @@
 <template>
   <nav class="w-full">
-    <div class="bg-black p-8 text-3xl text-white p-4 gap-8 flex justify-between items-center relative">
+    <div class="bg-black p-8 text-3xl text-white p-4 gap-8 flex justify-between items-center relative border-b border-purple-500/40">
       <div class="text-5xl flex items-center gap-4">
         <CircleDollarSign :size="40" color="#9810fa" />
         <router-link to="/" class="hover:text-purple-600">
@@ -29,7 +29,7 @@
       </ul>
 
       <div class="hidden md:flex gap-8">
-        <button>Entrar</button>
+        <button><router-link to="/login" class="">Entrar</router-link></button>
         <button>Começar Grátis</button>
       </div>
 
