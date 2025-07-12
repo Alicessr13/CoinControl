@@ -30,7 +30,7 @@
 
       <div class="hidden md:flex gap-8">
         <button><router-link to="/login" class="">Entrar</router-link></button>
-        <button>Começar Grátis</button>
+        <button><router-link to="/register" class="">Começar Grátis</router-link></button>
       </div>
 
       <Transition name="slide-fade">

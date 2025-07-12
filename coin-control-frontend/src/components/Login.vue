@@ -17,14 +17,14 @@
         <div class="flex flex-col gap-4">
           <label class="text-3xl" for="email">Email</label>
           <input
-            class="w-full text-3xl p-2 bg-gray-800/50 border-gray-700 rounded-lg text-white placeholder:text-gray-400"
+            class="w-full text-2xl p-4 bg-gray-800/50 border-gray-700 rounded-lg text-white placeholder:text-gray-400"
             id="email" v-model="email" type="email" placeholder="Seu email" required />
         </div>
 
         <div class="flex flex-col gap-4">
           <label class="text-3xl" for="password">Senha</label>
           <input
-            class="w-full text-3xl p-2 bg-gray-800/50 border-gray-700 rounded-lg text-white placeholder:text-gray-400"
+            class="w-full text-2xl p-4 bg-gray-800/50 border-gray-700 rounded-lg text-white placeholder:text-gray-400"
             id="password" v-model="password" type="password" placeholder="Sua senha" required />
         </div>
 
@@ -45,19 +45,19 @@
           </div>
         </div>
 
-        <button class="w-full text-3xl p-2 bg-gradient-to-r from-purple-500 to-pink-500 text-white rounded-lg cursor-pointer hover:bg-gradient-to-r hover:from-pink-500 hover:to-purple-500 hover:text-black transition duration-200"
+        <button
+          class="w-full text-3xl p-2 bg-gradient-to-r from-purple-500 to-pink-500 text-white rounded-lg cursor-pointer hover:bg-gradient-to-r hover:from-pink-500 hover:to-purple-500 hover:text-black transition duration-200"
           type="submit" :disabled="isLoading">
           {{ isLoading ? 'Entrando...' : 'Entrar' }}
         </button>
       </form>
+      <div v-if="error" class="text-red-500 text-2xl text-center">
+        {{ error }}
+      </div>
 
       <div class="text-center text-2xl">
         Não tem uma conta? <a href="/register" class="text-purple-600 hover:text-white text-2xl">Criar conta</a>
       </div>
-    </div>
-
-    <div v-if="error">
-      {{ error }}
     </div>
   </div>
 
