@@ -247,14 +247,14 @@
 
 <script lang="ts">
 import { defineComponent, ref, onMounted } from 'vue';
-import { jwtDecode } from 'jwt-decode';
+//import { jwtDecode } from 'jwt-decode';
 import { ChartNoAxesCombined, Plus, X, XCircle, Pencil, Check } from 'lucide-vue-next';
 import PieChart from './PieChart.vue';
 
-interface JwtPayload {
-  id_usuario: number
-  email: string
-}
+// interface JwtPayload {
+//   id_usuario: number
+//   email: string
+// }
 
 export default defineComponent({
   // eslint-disable-next-line vue/multi-word-component-names
@@ -269,8 +269,7 @@ export default defineComponent({
     PieChart,
   },
   setup() {
-    const userEmail = ref('')
-    const userId = ref<number | null>(null)
+    const userEmail = ref('');
 
     const menuRendaOpen = ref(false);
     const menuGastoOpen = ref(false);
@@ -633,14 +632,22 @@ export default defineComponent({
     }
 
     onMounted(() => {
-      const token = localStorage.getItem('token')
-      if (token) {
-        const decoded = jwtDecode<JwtPayload>(token);
-        userEmail.value = decoded.email;
-        userId.value = decoded.id_usuario;
+
+      if (!localStorage.getItem('pagina_recarregada')) {
+        localStorage.setItem('pagina_recarregada', 'true');
+        window.location.reload();
+      } else {
+        localStorage.removeItem('pagina_recarregada');
       }
-      console.log(userEmail.value);
-      console.log(userId.value);
+
+      // const token = localStorage.getItem('token')
+      // if (token) {
+      //   const decoded = jwtDecode<JwtPayload>(token);
+      //   userEmail.value = decoded.email;
+      //   userId.value = decoded.id_usuario;
+      // }
+      // console.log(userEmail.value);
+      // console.log(userId.value);
 
       menuRendaOpen.value = true;
 

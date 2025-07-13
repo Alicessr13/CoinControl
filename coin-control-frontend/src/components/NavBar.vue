@@ -18,19 +18,25 @@
           <router-link to="/" class="">Início</router-link>
         </li>
         <li class="">
-          <router-link to="/about" class="">Planejamento</router-link>
+          <router-link to="/about" class="">Sobre</router-link>
         </li>
         <li class="">
-          <router-link to="/dashboard" class="">Sobre</router-link>
+          <router-link to="/dashboard" class="">Planejamento</router-link>
         </li>
         <li class="">
           <router-link to="/contact" class="">Contato</router-link>
         </li>
       </ul>
 
-      <div class="hidden md:flex gap-8">
+      <div v-if="!isUserLoggedIn" class="hidden md:flex gap-8">
         <button><router-link to="/login" class="">Entrar</router-link></button>
         <button><router-link to="/register" class="">Começar Grátis</router-link></button>
+      </div>
+
+      <div v-else class="hidden md:flex gap-8">
+        <button><router-link to="/profile" class="">Perfil</router-link></button>
+        <button @click="logout">Sair</button>
+
       </div>
 
       <Transition name="slide-fade">
@@ -47,10 +53,10 @@
               <router-link to="/" class="">Início</router-link>
             </li>
             <li class="">
-              <router-link to="/about" class="">Planejamento</router-link>
+              <router-link to="=/dashboard" class="">Planejamento</router-link>
             </li>
             <li class="">
-              <router-link to="/dashboard" class="">Sobre</router-link>
+              <router-link to="/about" class="">Sobre</router-link>
             </li>
             <li class="">
               <router-link to="/contact" class="">Contato</router-link>
@@ -80,6 +86,19 @@ export default {
   methods: {
     toggleMenu() {
       this.menuOpen = !this.menuOpen
+    }
+  },
+  setup() {
+    const isUserLoggedIn = localStorage.getItem('token') !== null;
+
+    const logout = () => {
+      localStorage.removeItem('token')
+      window.location.href = '/login'
+    }
+
+    return {
+      isUserLoggedIn,
+      logout
     }
   }
 }
