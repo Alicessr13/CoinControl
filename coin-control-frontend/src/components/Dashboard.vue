@@ -76,7 +76,7 @@
                   class="border border-gray-200 rounded-lg p-4 text-2xl w-full" />
               </div>
             </div>
-            <button @click="criarRenda"
+            <button :disabled="loading" @click="criarRenda"
               class="bg-purple-600 rounded-lg p-6 text-white text-2xl w-full flex items-center justify-center gap-4 cursor-pointer hover:bg-purple-700 transition duration-200">
               <Plus />
               <div>Adicionar Renda</div>
@@ -143,7 +143,7 @@
                 class="flex items-center justify-between text-4xl rounded-lg p-6 border border-gray-200">
                 <input v-model="descricaoEditadaGasto" />
                 <div class="flex items-center gap-6">
-                  <input v-model.number="valorEditadoGasto" class="text-end text-purple-600 font-bold" type="number" />
+                  <input v-model.number="valorEditadoGasto" class="text-end text-red-600 font-bold" type="number" />
                   <button @click="salvarEdicaoGasto">
                     <Check />
                   </button>
@@ -155,7 +155,7 @@
               <div v-else class="flex items-center justify-between text-4xl rounded-lg p-6 border border-gray-200">
                 <span>{{ gasto.descricao }}</span>
                 <div class="flex items-center gap-6">
-                  <span class="text-purple-600 font-bold">R$ {{ gasto.valor }}</span>
+                  <span class="text-red-600 font-bold">R$ {{ gasto.valor }}</span>
                   <button @click="iniciarEdicaoGasto(gasto)">
                     <Pencil />
                   </button>
@@ -198,7 +198,7 @@
                 class="flex items-center justify-between text-4xl rounded-lg p-6 border border-gray-200">
                 <input v-model="descricaoEditadaPlanejamento" />
                 <div class="flex items-center gap-6">
-                  <input v-model.number="valorEditadoPlanejamento" class="text-end text-purple-600 font-bold"
+                  <input v-model.number="valorEditadoPlanejamento" class="text-end text-blue-600 font-bold"
                     type="number" />
                   <span class="text-purple-600 font-bold">%</span>
                   <button @click="salvarEdicaoPlanejamento">
@@ -215,7 +215,7 @@
                   <span class="text-2xl text-gray-600">Valor calculado: R$ {{ p.valor_calculado }}</span>
                 </div>
                 <div class="flex items-center gap-6">
-                  <span class="text-purple-600 font-bold">{{ p.valor }}%</span>
+                  <span class="text-blue-600 font-bold">{{ p.valor }}%</span>
                   <button @click="iniciarEdicaoPlanejamento(p)">
                     <Pencil />
                   </button>
@@ -229,11 +229,14 @@
         </div>
       </div>
 
-      <div class="w-1/2 bg-black">
-        <div>teste</div>
+      <div class="w-1/2 border border-gray-400/50 rounded-lg py-8 px-12">
+        <div class="text-4xl w-full font-bold pb-8">Distribuição - Pizza</div>
+        <div class="flex items-center justify-center h-full w-full" style="height: 500px;">
+          <PieChart :rendas="totalRenda" :gastos="totalGasto" :planejamentos="totalPlanejamento"
+            :disponivel="totalRenda - totalGasto - totalPlanejamento" />
+        </div>
       </div>
     </div>
-
 
     <!-- <button class="" @click="logout">Sair</button>
       <button>
@@ -246,6 +249,7 @@
 import { defineComponent, ref, onMounted } from 'vue';
 import { jwtDecode } from 'jwt-decode';
 import { ChartNoAxesCombined, Plus, X, XCircle, Pencil, Check } from 'lucide-vue-next';
+import PieChart from './PieChart.vue';
 
 interface JwtPayload {
   id_usuario: number
@@ -261,7 +265,8 @@ export default defineComponent({
     X,
     XCircle,
     Pencil,
-    Check
+    Check,
+    PieChart,
   },
   setup() {
     const userEmail = ref('')
@@ -270,6 +275,7 @@ export default defineComponent({
     const menuRendaOpen = ref(false);
     const menuGastoOpen = ref(false);
     const menuPlanejamentoOpen = ref(false);
+    const loading = ref(false);
 
     const openMenuRenda = () => {
       menuRendaOpen.value = true;
@@ -318,6 +324,7 @@ export default defineComponent({
     }
 
     const criarRenda = async () => {
+      loading.value = true
       const token = localStorage.getItem('token')
       if (!token || !novaDescricao.value || !novoValor.value) return
 
@@ -337,8 +344,11 @@ export default defineComponent({
         novaDescricao.value = ''
         novoValor.value = null
         await carregarRendas()
+        await carregarPlanejamentos()
       } catch (err) {
         console.error('Erro ao criar renda', err)
+      } finally {
+        loading.value = false
       }
     }
 
@@ -354,6 +364,7 @@ export default defineComponent({
           },
         })
         await carregarRendas()
+        await carregarPlanejamentos()
       } catch (err) {
         console.error('Erro ao excluir renda', err)
       }
@@ -386,6 +397,7 @@ export default defineComponent({
         descricaoEditada.value = ''
         valorEditado.value = null
         await carregarRendas()
+        await carregarPlanejamentos()
       } catch (err) {
         console.error('Erro ao editar renda', err)
       }
@@ -445,6 +457,7 @@ export default defineComponent({
         novaDescricaoGasto.value = ''
         novoValorGasto.value = null
         await carregarGastos()
+        await carregarPlanejamentos()
       } catch (err) {
         console.error('Erro ao criar gasto', err)
       }
@@ -463,6 +476,7 @@ export default defineComponent({
         })
 
         await carregarGastos()
+        await carregarPlanejamentos()
       } catch (err) {
         console.error('Erro ao excluir gasto', err)
       }
@@ -495,6 +509,7 @@ export default defineComponent({
         descricaoEditadaGasto.value = ''
         valorEditadoGasto.value = null
         await carregarGastos()
+        await carregarPlanejamentos()
       } catch (err) {
         console.error('Erro ao editar gasto', err)
       }
@@ -678,7 +693,8 @@ export default defineComponent({
       menuPlanejamentoOpen,
       openMenuRenda,
       openMenuGasto,
-      openMenuPlanejamento
+      openMenuPlanejamento,
+      loading,
     }
   },
 })
