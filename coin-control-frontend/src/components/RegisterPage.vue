@@ -1,8 +1,8 @@
 <template>
   <div class="flex flex-col p-24 h-full w-full items-center bg-purple-50 text-black">
 
-    <div class="min-w-[500px] flex flex-col gap-8" @click="$router.push('/')">
-      <div class="flex items-center gap-4 mb-8 text-2xl cursor-pointer">
+    <div class="min-w-[500px] flex flex-col gap-8" >
+      <div class="flex items-center gap-4 mb-8 text-2xl cursor-pointer" @click="$router.push('/')">
         <ArrowLeft class="" />
         <div>Voltar</div>
       </div>

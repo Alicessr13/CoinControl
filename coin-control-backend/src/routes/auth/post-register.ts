@@ -16,15 +16,18 @@ export async function postRegister(request: FastifyRequest, reply: FastifyReply)
     // Verificar se o email já está em uso
     const check_email_query: QueryConfig = {
         text: `
-            SELECT * FROM usuarios
-            WHERE email = $1
+            SELECT EXISTS (
+                SELECT 1 FROM usuarios WHERE email = $1
+            ) AS email_exists
         `,
         values: [email],
     };
 
-    const existing_user = await sql<{ id_usuario: number }>(check_email_query);
+    const select_email_exists = await sql<{ email_exists: boolean }>(check_email_query);
 
-    if (existing_user.length > 0) {
+    const { email_exists } = select_email_exists[0];
+
+    if (email_exists) {
         throw new AppError('E-mail já cadastrado', 400);
     }
 
